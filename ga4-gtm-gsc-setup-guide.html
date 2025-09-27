@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA4, GSC & GTM Visual Setup Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step-card { transition: all 0.3s ease; }
+        .step-card:hover { transform: translateY(-2px); }
+        .selected { border-color: #3b82f6 !important; background-color: #dbeafe !important; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-6xl mx-auto p-6 min-h-screen">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">GA4, GSC & GTM Visual Setup Guide</h1>
+            <p class="text-gray-600">Choose your current setup to get customized next steps</p>
+        </div>
+
+        <!-- Step 1: Current Status -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">1</span>
+                What does the client currently have?
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="scenarios">
+                <button onclick="selectScenario('nothing', '🆕', 'Starting Fresh', false, false, false)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">🆕</div>
+                    <div class="font-medium text-sm">Starting Fresh</div>
+                </button>
+                <button onclick="selectScenario('gsc-only', '🔍', 'GSC Only', true, false, false)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">🔍</div>
+                    <div class="font-medium text-sm">GSC Only</div>
+                </button>
+                <button onclick="selectScenario('ga4-only', '📊', 'GA4 Only', false, false, true)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">📊</div>
+                    <div class="font-medium text-sm">GA4 Only</div>
+                </button>
+                <button onclick="selectScenario('gtm-only', '🏷️', 'GTM Only', false, true, false)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">🏷️</div>
+                    <div class="font-medium text-sm">GTM Only</div>
+                </button>
+                <button onclick="selectScenario('gsc-gtm', '🔍🏷️', 'GSC + GTM', true, true, false)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">🔍🏷️</div>
+                    <div class="font-medium text-sm">GSC + GTM</div>
+                </button>
+                <button onclick="selectScenario('gsc-ga4', '🔍📊', 'GSC + GA4', true, false, true)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">🔍📊</div>
+                    <div class="font-medium text-sm">GSC + GA4</div>
+                </button>
+                <button onclick="selectScenario('gtm-ga4', '🏷️📊', 'GTM + GA4', false, true, true)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">🏷️📊</div>
+                    <div class="font-medium text-sm">GTM + GA4</div>
+                </button>
+                <button onclick="selectScenario('everything', '✅', 'All Setup', true, true, true)" class="scenario-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 step-card">
+                    <div class="text-2xl mb-2">✅</div>
+                    <div class="font-medium text-sm">All Setup</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Current Status Details -->
+        <div id="status-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <span class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">2</span>
+                Current Setup Status
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="gsc-status" class="flex items-center p-3 rounded-lg border-2">
+                    <div class="text-2xl mr-3">🔍</div>
+                    <div>
+                        <div class="font-medium">Google Search Console</div>
+                        <div class="flex items-center mt-1" id="gsc-indicator">
+                        </div>
+                    </div>
+                </div>
+                <div id="gtm-status" class="flex items-center p-3 rounded-lg border-2">
+                    <div class="text-2xl mr-3">🏷️</div>
+                    <div>
+                        <div class="font-medium">Google Tag Manager</div>
+                        <div class="flex items-center mt-1" id="gtm-indicator">
+                        </div>
+                    </div>
+                </div>
+                <div id="ga4-status" class="flex items-center p-3 rounded-lg border-2">
+                    <div class="text-2xl mr-3">📊</div>
+                    <div>
+                        <div class="font-medium">Google Analytics 4</div>
+                        <div class="flex items-center mt-1" id="ga4-indicator">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: CMS Selection -->
+        <div id="cms-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <span class="bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">3</span>
+                What platform is the website built on?
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button onclick="selectCMS('wordpress-org', 'WordPress (Self-hosted)', 'Medium')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">WordPress (Self-hosted)</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-yellow-100 text-yellow-800">Medium</div>
+                </button>
+                <button onclick="selectCMS('wordpress-com', 'WordPress.com', 'Easy')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">WordPress.com</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-green-100 text-green-800">Easy</div>
+                </button>
+                <button onclick="selectCMS('shopify', 'Shopify', 'Easy')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Shopify</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-green-100 text-green-800">Easy</div>
+                </button>
+                <button onclick="selectCMS('squarespace', 'Squarespace', 'Easy')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Squarespace</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-green-100 text-green-800">Easy</div>
+                </button>
+                <button onclick="selectCMS('wix', 'Wix', 'Easy')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Wix</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-green-100 text-green-800">Easy</div>
+                </button>
+                <button onclick="selectCMS('webflow', 'Webflow', 'Medium')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Webflow</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-yellow-100 text-yellow-800">Medium</div>
+                </button>
+                <button onclick="selectCMS('godaddy', 'GoDaddy Builder', 'Easy')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">GoDaddy Builder</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-green-100 text-green-800">Easy</div>
+                </button>
+                <button onclick="selectCMS('bigcommerce', 'BigCommerce', 'Medium')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">BigCommerce</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-yellow-100 text-yellow-800">Medium</div>
+                </button>
+                <button onclick="selectCMS('custom', 'Custom/HTML', 'Hard')" class="cms-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Custom/HTML</div>
+                    <div class="text-xs mt-1 px-2 py-1 rounded inline-block bg-red-100 text-red-800">Hard</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Setup Mode -->
+        <div id="mode-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <span class="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">4</span>
+                Who will handle the setup?
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="selectMode('self')" class="mode-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Client Self-Setup</div>
+                    <div class="text-sm text-gray-600 mt-1">Provide step-by-step instructions</div>
+                </button>
+                <button onclick="selectMode('professional')" class="mode-btn p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-left step-card">
+                    <div class="font-medium">Professional Setup</div>
+                    <div class="text-sm text-gray-600 mt-1">We handle the implementation</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5: Action Plan -->
+        <div id="plan-section" class="bg-white rounded-lg shadow-lg p-6 hidden">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <span class="bg-indigo-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">5</span>
+                Your Action Plan
+            </h2>
+            <div id="plan-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentScenario = null;
+        let currentCMS = null;
+        let currentMode = null;
+
+        const scenarios = {
+            'nothing': { title: 'Complete Setup from Scratch', steps: [
+                { tool: 'GSC', action: 'Set up Google Search Console', priority: 1, color: 'bg-blue-100 border-blue-300', 
+                  substeps: [
+                    'Go to search.google.com/search-console',
+                    'Click "Start now" and sign in with Google account',
+                    'Click "Add property" → Choose "URL prefix"',
+                    'Enter your full website URL (https://www.yoursite.com)',
+                    'Choose verification method and follow platform-specific steps',
+                    'Click "Verify" once verification file/code is installed'
+                  ]
+                },
+                { tool: 'GTM', action: 'Install Google Tag Manager', priority: 2, color: 'bg-green-100 border-green-300',
+                  substeps: [
+                    'Go to tagmanager.google.com',
+                    'Click "Create Account" → Enter business name',
+                    'Container name: Your website URL',
+                    'Target platform: Web → Accept terms',
+                    'Copy the GTM code snippets provided',
+                    'Install codes on your website using platform-specific method',
+                    'Click "Submit" to publish container'
+                  ]
+                },
+                { tool: 'GA4', action: 'Configure GA4 through GTM', priority: 3, color: 'bg-purple-100 border-purple-300',
+                  substeps: [
+                    'Go to analytics.google.com',
+                    'Click "Start measuring" → Create account',
+                    'Enter business name and select settings',
+                    'Create property → Enter website name',
+                    'Choose "Web" platform → Enter website URL',
+                    'Copy the GA4 Measurement ID (G-XXXXXXXXXX)',
+                    'In GTM: Create new tag → Google Analytics: GA4 Configuration',
+                    'Paste Measurement ID → Set trigger to "All Pages"',
+                    'Submit and publish GTM container'
+                  ]
+                },
+                { tool: 'LINK', action: 'Link all properties together', priority: 4, color: 'bg-orange-100 border-orange-300',
+                  substeps: [
+                    'In GA4: Go to Admin → Property Settings',
+                    'Click "Search Console links" → Link Search Console',
+                    'Select your verified GSC property',
+                    'Choose "All web site data" → Confirm linking',
+                    'Wait 24-48 hours for data to start flowing',
+                    'Verify connection in both GA4 and GSC'
+                  ]
+                }
+            ]},
+            'gsc-only': { title: 'Add GTM + GA4 to existing GSC', steps: [
+                { tool: 'CHECK', action: 'Verify GSC is collecting data', priority: 1, color: 'bg-blue-100 border-blue-300',
+                  substeps: [
+                    'Go to search.google.com/search-console',
+                    'Select your property from the dropdown',
+                    'Check "Overview" tab for recent data',
+                    'Verify "Performance" tab shows search queries',
+                    'Confirm property status shows "Verified"',
+                    'Note the property URL for later linking'
+                  ]
+                },
+                { tool: 'GTM', action: 'Install Google Tag Manager', priority: 2, color: 'bg-green-100 border-green-300',
+                  substeps: [
+                    'Go to tagmanager.google.com',
+                    'Click "Create Account" → Enter business name',
+                    'Container name: Your website URL',
+                    'Target platform: Web → Accept terms',
+                    'Copy both GTM code snippets provided',
+                    'Install codes on your website using platform method below',
+                    'Test installation using Preview mode',
+                    'Submit and publish container'
+                  ]
+                },
+                { tool: 'GA4', action: 'Configure GA4 through GTM', priority: 3, color: 'bg-purple-100 border-purple-300',
+                  substeps: [
+                    'Go to analytics.google.com → "Start measuring"',
+                    'Create account → Enter business details',
+                    'Create property → Enter website information',
+                    'Copy GA4 Measurement ID (starts with G-)',
+                    'In GTM: Tags → New → GA4 Configuration',
+                    'Paste Measurement ID → Trigger: All Pages',
+                    'Save tag → Submit → Publish container',
+                    'Test using GA4 Real-time reports'
+                  ]
+                },
+                { tool: 'LINK', action: 'Link GA4 to existing GSC', priority: 4, color: 'bg-orange-100 border-orange-300',
+                  substeps: [
+                    'In GA4: Admin → Property Settings',
+                    'Search Console links → Link Search Console',
+                    'Select your existing verified GSC property',
+                    'Choose data stream → Confirm linking',
+                    'Return to GSC → Settings → Associations',
+                    'Verify GA4 property appears as linked'
+                  ]
+                }
+            ]},
+            'ga4-only': { title: 'Add GSC + GTM, migrate GA4', steps: [
+                { tool: 'GSC', action: 'Set up Google Search Console', priority: 1, color: 'bg-blue-100 border-blue-300',
+                  substeps: [
+                    'Go to search.google.com/search-console',
+                    'Add property → URL prefix → Enter website URL',
+                    'Choose verification method for your platform',
+                    'Follow platform-specific verification steps below',
+                    'Click "Verify" after installing verification code',
+                    'Wait for "Property verified" confirmation'
+                  ]
+                },
+                { tool: 'GTM', action: 'Install Google Tag Manager', priority: 2, color: 'bg-green-100 border-green-300',
+                  substeps: [
+                    'Note your current GA4 Measurement ID first',
+                    'Go to tagmanager.google.com → Create Account',
+                    'Enter account and container details',
+                    'Copy GTM installation codes',
+                    'Install GTM codes using platform method',
+                    'Preview and test GTM installation',
+                    'Publish container when working correctly'
+                  ]
+                },
+                { tool: 'MIGRATE', action: 'Move GA4 tracking to GTM', priority: 3, color: 'bg-yellow-100 border-yellow-300',
+                  substeps: [
+                    'In GTM: Create new tag → GA4 Configuration',
+                    'Enter your existing GA4 Measurement ID',
+                    'Set trigger to "All Pages"',
+                    'Save and test tag in Preview mode',
+                    'Remove old GA4 tracking code from website',
+                    'Publish GTM container with GA4 tag',
+                    'Verify tracking continues in GA4 Real-time'
+                  ]
+                },
+                { tool: 'LINK', action: 'Link GSC to GA4', priority: 4, color: 'bg-orange-100 border-orange-300',
+                  substeps: [
+                    'In GA4: Admin → Search Console links',
+                    'Link Search Console → Select new GSC property',
+                    'Confirm linking and data stream selection',
+                    'Check GSC → Settings → Associations',
+                    'Verify both properties show as linked',
+                    'Wait 24-48 hours for data integration'
+                  ]
+                }
+            ]},
+            'gtm-only': { title: 'Add GSC + GA4 to existing GTM', steps: [
+                { tool: 'GSC', action: 'Set up Google Search Console', priority: 1, color: 'bg-blue-100 border-blue-300',
+                  substeps: [
+                    'Go to search.google.com/search-console',
+                    'Add property → URL prefix method',
+                    'Enter your complete website URL',
+                    'Select verification method for your platform',
+                    'Install verification using platform steps below',
+                    'Click "Verify" and confirm success'
+                  ]
+                },
+                { tool: 'GA4', action: 'Add GA4 tag to existing GTM', priority: 2, color: 'bg-purple-100 border-purple-300',
+                  substeps: [
+                    'Go to analytics.google.com → Start measuring',
+                    'Create GA4 account and property',
+                    'Copy the GA4 Measurement ID',
+                    'In existing GTM: Tags → New',
+                    'Tag type: Google Analytics → GA4 Configuration',
+                    'Paste Measurement ID → Trigger: All Pages',
+                    'Save, preview, and publish container'
+                  ]
+                },
+                { tool: 'LINK', action: 'Link GSC to GA4', priority: 3, color: 'bg-orange-100 border-orange-300',
+                  substeps: [
+                    'In GA4: Admin → Search Console links',
+                    'Link Search Console → Choose GSC property',
+                    'Select data stream and confirm',
+                    'Test connection in both platforms',
+                    'Verify data flow after 24-48 hours'
+                  ]
+                }
+            ]},
+            'gsc-gtm': { title: 'Add GA4 to existing setup', steps: [
+                { tool: 'CHECK', action: 'Verify GSC & GTM working', priority: 1, color: 'bg-gray-100 border-gray-300',
+                  substeps: [
+                    'Check GSC for recent search data',
+                    'Open GTM → Preview mode',
+                    'Visit your website → Verify GTM loads',
+                    'Check Tags tab shows firing tags',
+                    'Confirm GTM container is published',
+                    'Note any existing GA tags in GTM'
+                  ]
+                },
+                { tool: 'GA4', action: 'Add GA4 tag to GTM', priority: 2, color: 'bg-purple-100 border-purple-300',
+                  substeps: [
+                    'Create GA4 property at analytics.google.com',
+                    'Copy GA4 Measurement ID',
+                    'In GTM: Tags → New → GA4 Configuration',
+                    'Enter Measurement ID → All Pages trigger',
+                    'Preview tag firing on website',
+                    'Submit and publish GTM container',
+                    'Verify in GA4 Real-time reports'
+                  ]
+                },
+                { tool: 'LINK', action: 'Link GSC to new GA4', priority: 3, color: 'bg-orange-100 border-orange-300',
+                  substeps: [
+                    'GA4 Admin → Search Console links',
+                    'Select existing GSC property',
+                    'Confirm data stream linking',
+                    'Verify connection established',
+                    'Check data integration after 24 hours'
+                  ]
+                }
+            ]},
+            'gsc-ga4': { title: 'Add GTM and migrate', steps: [
+                { tool: 'GTM', action: 'Install Google Tag Manager', priority: 1, color: 'bg-green-100 border-green-300',
+                  substeps: [
+                    'Note current GA4 Measurement ID first',
+                    'Create GTM account at tagmanager.google.com',
+                    'Copy installation code snippets',
+                    'Install GTM using platform method below',
+                    'Test GTM loads correctly',
+                    'Publish empty container initially'
+                  ]
+                },
+                { tool: 'MIGRATE', action: 'Move GA4 tracking to GTM', priority: 2, color: 'bg-yellow-100 border-yellow-300',
+                  substeps: [
+                    'In GTM: Create GA4 Configuration tag',
+                    'Use existing GA4 Measurement ID',
+                    'Set All Pages trigger',
+                    'Preview and test tag',
+                    'Remove direct GA4 code from website',
+                    'Publish GTM with GA4 tag',
+                    'Verify continuous tracking'
+                  ]
+                },
+                { tool: 'CHECK', action: 'Verify GSC-GA4 linking', priority: 3, color: 'bg-gray-100 border-gray-300',
+                  substeps: [
+                    'Check GA4 → Admin → Search Console links',
+                    'Verify GSC property is connected',
+                    'Test data flow between platforms',
+                    'Check Search Console associations',
+                    'Confirm integration working properly'
+                  ]
+                }
+            ]},
+            'gtm-ga4': { title: 'Add GSC to complete setup', steps: [
+                { tool: 'GSC', action: 'Set up Google Search Console', priority: 1, color: 'bg-blue-100 border-blue-300',
+                  substeps: [
+                    'Go to search.google.com/search-console',
+                    'Add property using URL prefix',
+                    'Complete verification for your platform',
+                    'Confirm property verification',
+                    'Wait for initial data collection'
+                  ]
+                },
+                { tool: 'LINK', action: 'Link new GSC to GA4', priority: 2, color: 'bg-orange-100 border-orange-300',
+                  substeps: [
+                    'In GA4: Admin → Search Console links',
+                    'Link the new GSC property',
+                    'Select appropriate data stream',
+                    'Confirm linking setup',
+                    'Verify connection in both platforms'
+                  ]
+                },
+                { tool: 'CHECK', action: 'Verify all connections', priority: 3, color: 'bg-gray-100 border-gray-300',
+                  substeps: [
+                    'Test GTM tags firing correctly',
+                    'Confirm GA4 receiving data',
+                    'Check GSC data collection',
+                    'Verify all properties linked',
+                    'Document setup completion'
+                  ]
+                }
+            ]},
+            'everything': { title: 'Audit & Optimize existing setup', steps: [
+                { tool: 'AUDIT', action: 'Check GSC data flow', priority: 1, color: 'bg-blue-100 border-blue-300',
+                  substeps: [
+                    'Review GSC Performance data completeness',
+                    'Check for crawl errors or issues',
+                    'Verify all important pages indexed',
+                    'Review sitemap submission status',
+                    'Check mobile usability reports'
+                  ]
+                },
+                { tool: 'AUDIT', action: 'Verify GTM tags firing', priority: 2, color: 'bg-green-100 border-green-300',
+                  substeps: [
+                    'Use GTM Preview mode on website',
+                    'Check all tags firing correctly',
+                    'Verify triggers working properly',
+                    'Test on different page types',
+                    'Review GTM container health'
+                  ]
+                },
+                { tool: 'AUDIT', action: 'Confirm GA4 accuracy', priority: 3, color: 'bg-purple-100 border-purple-300',
+                  substeps: [
+                    'Review GA4 Real-time data accuracy',
+                    'Check conversion tracking setup',
+                    'Verify audience definitions',
+                    'Test goal completions',
+                    'Review data retention settings'
+                  ]
+                },
+                { tool: 'OPTIMIZE', action: 'Set up advanced tracking', priority: 4, color: 'bg-indigo-100 border-indigo-300',
+                  substeps: [
+                    'Configure enhanced ecommerce (if applicable)',
+                    'Set up custom events and conversions',
+                    'Create audience segments',
+                    'Implement cross-domain tracking',
+                    'Set up automated reports'
+                  ]
+                }
+            ]}
+        };
+
+        const cmsInstructions = {
+            'wordpress-org': {
+                'GSC': `<strong>Method 1 - HTML File Upload (Recommended):</strong><br>
+                1. Download the verification HTML file from Google Search Console<br>
+                2. Access your website files via cPanel File Manager or FTP<br>
+                3. Navigate to public_html folder (or your domain's root folder)<br>
+                4. Upload the HTML file directly to this folder<br>
+                5. Test: Visit yoursite.com/google[verification-code].html<br>
+                6. Return to GSC and click "Verify"<br><br>
+                <strong>Method 2 - Using Site Kit Plugin:</strong><br>
+                1. Install "Site Kit by Google" plugin from WordPress admin<br>
+                2. Go to Site Kit → Settings → Connect More Services<br>
+                3. Click "Set up Search Console" and follow authentication<br>
+                4. Verification happens automatically through plugin`,
+                
+                'GTM': `<strong>Method 1 - Using Plugin (Easiest):</strong><br>
+                1. Install "Google Tag Manager for WordPress" plugin<br>
+                2. Go to Settings → Google Tag Manager<br>
+                3. Enter your GTM Container ID (GTM-XXXXXXX)<br>
+                4. Enable "Container Code" and "Track logged in users"<br>
+                5. Save settings - plugin handles code placement<br><br>
+                <strong>Method 2 - Manual Code Installation:</strong><br>
+                1. Go to Appearance → Theme Editor → theme.php or header.php<br>
+                2. Paste GTM head code before closing &lt;/head&gt; tag<br>
+                3. Paste GTM body code after opening &lt;body&gt; tag<br>
+                4. Update file and test with GTM Preview mode`,
+                
+                'GA4': `<strong>Via Google Tag Manager (Recommended):</strong><br>
+                1. In GTM: Tags → New → Google Analytics → GA4 Configuration<br>
+                2. Enter GA4 Measurement ID in configuration<br>
+                3. Set Triggering to "All Pages"<br>
+                4. Save tag and publish container<br><br>
+                <strong>Via Site Kit Plugin:</strong><br>
+                1. Go to Site Kit → Settings → Connect Analytics<br>
+                2. Follow authentication flow<br>
+                3. Select or create GA4 property<br>
+                4. Plugin handles tracking code automatically`
+            },
+            'wordpress-com': {
+                'GSC': `<strong>Business Plan or Higher Required:</strong><br>
+                1. Go to My Site → Settings → SEO (Business plan required)<br>
+                2. Scroll to "Website Meta" section<br>
+                3. Paste the GSC verification meta tag<br>
+                4. Click "Save Settings"<br>
+                5. Return to GSC and verify<br><br>
+                <strong>Alternative - Domain Provider Method:</strong><br>
+                1. In GSC, choose "Domain name provider" verification<br>
+                2. Copy the TXT record provided<br>
+                3. Go to My Site → Domains → DNS Records<br>
+                4. Add new TXT record with the value<br>
+                5. Wait up to 24 hours, then verify in GSC`,
+                
+                'GTM': `<strong>Business Plan Required:</strong><br>
+                1. Go to My Site → Settings → Advanced<br>
+                2. Click "Code Injection"<br>
+                3. Paste GTM head code in "Header" section<br>
+                4. Paste GTM body code in "Footer" section<br>
+                5. Save settings<br><br>
+                <strong>Personal/Premium Plans:</strong><br>
+                Limited functionality - consider upgrading to Business plan or use built-in Google Analytics integration instead`,
+                
+                'GA4': `<strong>Built-in Integration:</strong><br>
+                1. Go to My Site → Settings → Advanced<br>
+                2. Click "Analytics"<br>
+                3. Enter your GA4 Measurement ID (G-XXXXXXXXXX)<br>
+                4. Save settings - tracking is automatic<br><br>
+                <strong>Via GTM (Business Plan):</strong><br>
+                Use GTM method above, then configure GA4 tag in GTM dashboard`
+            },
+            'shopify': {
+                'GSC': `<strong>Method 1 - Meta Tag (Recommended):</strong><br>
+                1. Go to Online Store → Themes → Actions → Edit Code<br>
+                2. Open "theme.liquid" file<br>
+                3. Find the &lt;head&gt; section<br>
+                4. Paste verification meta tag before &lt;/head&gt;<br>
+                5. Save file<br>
+                6. Return to GSC and verify<br><br>
+                <strong>Method 2 - HTML File Upload:</strong><br>
+                1. Download verification file from GSC<br>
+                2. Go to Settings → Files<br>
+                3. Click "Upload files" and select verification file<br>
+                4. File becomes accessible at yourstore.com/files/[filename].html<br>
+                5. Verify in GSC`,
+                
+                'GTM': `<strong>Theme Code Method:</strong><br>
+                1. Go to Online Store → Themes → Actions → Edit Code<br>
+                2. Open "theme.liquid" file<br>
+                3. Paste GTM head code right after &lt;head&gt; tag<br>
+                4. Paste GTM body code right after &lt;body&gt; tag<br>
+                5. Save theme.liquid file<br>
+                6. Test using GTM Preview mode<br><br>
+                <strong>Note:</strong> Code must be re-added after theme updates`,
+                
+                'GA4': `<strong>Built-in Google Analytics:</strong><br>
+                1. Go to Online Store → Preferences<br>
+                2. Scroll to "Google Analytics" section<br>
+                3. Enter your GA4 Measurement ID (G-XXXXXXXXXX)<br>
+                4. Save preferences<br><br>
+                <strong>Enhanced Tracking via GTM:</strong><br>
+                Use GTM installation above, then set up enhanced ecommerce tracking in GTM for better conversion data`
+            },
+            'squarespace': {
+                'GSC': `<strong>Method 1 - Built-in Integration:</strong><br>
+                1. Go to Settings → Connected Accounts<br>
+                2. Click "Connect Account" next to Google<br>
+                3. Authenticate with Google account<br>
+                4. GSC verification happens automatically<br><br>
+                <strong>Method 2 - Meta Tag:</strong><br>
+                1. Go to Settings → Advanced → Code Injection<br>
+                2. Paste verification meta tag in "Header" section<br>
+                3. Save and publish site<br>
+                4. Return to GSC and verify`,
+                
+                'GTM': `<strong>Code Injection Method:</strong><br>
+                1. Go to Settings → Advanced → Code Injection<br>
+                2. Paste GTM head code in "Header" section<br>
+                3. Paste GTM body code in "Footer" section<br>
+                4. Save changes<br>
+                5. Publish site for changes to take effect<br><br>
+                <strong>Note:</strong> Business plan or higher required for Code Injection feature`,
+                
+                'GA4': `<strong>Built-in Analytics:</strong><br>
+                1. Go to Analytics → External Services<br>
+                2. Click "Google Analytics"<br>
+                3. Enter GA4 Measurement ID<br>
+                4. Save and publish site<br><br>
+                <strong>Via GTM (Business Plan):</strong><br>
+                Use Code Injection method above, then configure GA4 in GTM`
+            },
+            'wix': {
+                'GSC': `<strong>Built-in SEO Tools (Recommended):</strong><br>
+                1. Go to Marketing & SEO → SEO Tools<br>
+                2. Click "Get found on Google"<br>
+                3. Connect your Google account<br>
+                4. Automatic GSC setup and verification<br><br>
+                <strong>Manual Meta Tag Method:</strong><br>
+                1. Go to Settings → SEO & Marketing → SEO Tools<br>
+                2. Click "Verification & Meta Tags"<br>
+                3. Paste verification meta tag<br>
+                4. Publish site and verify in GSC`,
+                
+                'GTM': `<strong>Custom Code Method:</strong><br>
+                1. Go to Settings → Custom Code<br>
+                2. Click "Add Custom Code"<br>
+                3. Name: "GTM Head Code"<br>
+                4. Paste GTM head snippet<br>
+                5. Place in: Head, Load on: All pages<br>
+                6. Add another code for GTM body snippet<br>
+                7. Publish site for changes to take effect`,
+                
+                'GA4': `<strong>Built-in Google Analytics:</strong><br>
+                1. Go to Analytics & Reports<br>
+                2. Click "Go to Google Analytics"<br>
+                3. Connect Google account and select GA4 property<br>
+                4. Or enter GA4 Measurement ID manually<br><br>
+                <strong>Via Custom Code:</strong><br>
+                Use Custom Code method to install GTM, then configure GA4 through GTM`
+            },
+            'webflow': {
+                'GSC': `<strong>Custom Head Code Method:</strong><br>
+                1. Open Project Settings → SEO → Indexing<br>
+                2. Paste verification meta tag in "Custom Head Code"<br>
+                3. Publish site to live domain<br>
+                4. Return to GSC and verify<br><br>
+                <strong>HTML Embed Method:</strong><br>
+                1. Add HTML Embed element to any page<br>
+                2. Paste verification meta tag<br>
+                3. Publish site and verify`,
+                
+                'GTM': `<strong>Project Custom Code:</strong><br>
+                1. Go to Project Settings → Custom Code<br>
+                2. Paste GTM head code in "Head Code" section<br>
+                3. Paste GTM body code in "Footer Code" section<br>
+                4. Publish site to staging<br>
+                5. Test with GTM Preview mode<br>
+                6. Publish to live domain`,
+                
+                'GA4': `<strong>Built-in Integration:</strong><br>
+                1. Project Settings → Integrations<br>
+                2. Click "Google Analytics"<br>
+                3. Enter GA4 Measurement ID (G-XXXXXXXXXX)<br>
+                4. Publish site<br><br>
+                <strong>Via GTM (Advanced):</strong><br>
+                Use Custom Code method above for more control over tracking`
+            },
+            'godaddy': {
+                'GSC': `<strong>Website Builder SEO Settings:</strong><br>
+                1. Edit your website in GoDaddy Website Builder<br>
+                2. Go to SEO → Search Engine Optimization<br>
+                3. Click "Header Tags"<br>
+                4. Paste verification meta tag in "Header Tags" field<br>
+                5. Publish website<br>
+                6. Return to GSC and verify<br><br>
+                <strong>Note:</strong> HTML file upload not supported in Website Builder`,
+                
+                'GTM': `<strong>Pro Plan Required for Custom Code:</strong><br>
+                1. Edit website → Add section<br>
+                2. Choose "HTML" or "Embed" element<br>
+                3. Paste GTM head code in header area<br>
+                4. Add another HTML block for body code<br>
+                5. Publish website<br><br>
+                <strong>Basic Plans:</strong><br>
+                Limited to built-in Google Analytics integration`,
+                
+                'GA4': `<strong>Built-in Google Analytics:</strong><br>
+                1. Edit website → SEO<br>
+                2. Click "Google Analytics"<br>
+                3. Enter GA4 Measurement ID<br>
+                4. Publish website<br><br>
+                <strong>Advanced Tracking:</strong><br>
+                Requires Pro plan for custom code implementation`
+            },
+            'bigcommerce': {
+                'GSC': `<strong>Method 1 - Script Manager:</strong><br>
+                1. Go to Advanced Settings → Script Manager<br>
+                2. Create Script → Name: "GSC Verification"<br>
+                3. Location: Head<br>
+                4. Select pages: All pages<br>
+                5. Script category: Analytics<br>
+                6. Paste verification meta tag<br>
+                7. Save script<br><br>
+                <strong>Method 2 - Web Analytics:</strong><br>
+                1. Advanced Settings → Web Analytics<br>
+                2. Paste meta tag in "Google Analytics" field<br>
+                3. Save settings`,
+                
+                'GTM': `<strong>Script Manager Method:</strong><br>
+                1. Advanced Settings → Script Manager<br>
+                2. Create Script → Name: "GTM Head"<br>
+                3. Location: Head, Pages: All pages<br>
+                4. Paste GTM head code<br>
+                5. Create another script for GTM body code<br>
+                6. Location: Footer, Pages: All pages<br>
+                7. Save both scripts and test`,
+                
+                'GA4': `<strong>Built-in Web Analytics:</strong><br>
+                1. Advanced Settings → Web Analytics<br>
+                2. Select "Google Analytics"<br>
+                3. Enter GA4 Measurement ID<br>
+                4. Save settings<br><br>
+                <strong>Enhanced via GTM:</strong><br>
+                Use Script Manager method for GTM, then configure enhanced ecommerce in GTM`
+            },
+            'custom': {
+                'GSC': `<strong>Method 1 - HTML File Upload:</strong><br>
+                1. Download verification file from GSC<br>
+                2. Connect to your server via FTP (FileZilla, etc.)<br>
+                3. Navigate to website root directory (public_html, www, etc.)<br>
+                4. Upload HTML file to root directory<br>
+                5. Test: Visit yoursite.com/[verification-file].html<br>
+                6. Return to GSC and click "Verify"<br><br>
+                <strong>Method 2 - Meta Tag:</strong><br>
+                1. Open your website's index.html or header template<br>
+                2. Locate the &lt;head&gt; section<br>
+                3. Add verification meta tag before &lt;/head&gt;<br>
+                4. Save and upload file to server<br>
+                5. Verify in GSC`,
+                
+                'GTM': `<strong>Manual Code Installation:</strong><br>
+                1. Open your website's main template/header file<br>
+                2. Paste GTM head code immediately after &lt;head&gt; tag<br>
+                3. Paste GTM body code immediately after &lt;body&gt; tag<br>
+                4. Save file and upload to server<br>
+                5. Repeat for all page templates<br>
+                6. Test installation using GTM Preview mode<br><br>
+                <strong>For Single Page Applications:</strong><br>
+                Use GTM's dataLayer for dynamic content tracking`,
+                
+                'GA4': `<strong>Via Google Tag Manager (Recommended):</strong><br>
+                1. Complete GTM installation above<br>
+                2. In GTM dashboard: Tags → New<br>
+                3. Tag Type: Google Analytics → GA4 Configuration<br>
+                4. Enter Measurement ID<br>
+                5. Trigger: All Pages<br>
+                6. Save and publish container<br><br>
+                <strong>Direct Installation:</strong><br>
+                1. Copy GA4 tracking code from Google Analytics<br>
+                2. Paste in &lt;head&gt; section of all pages<br>
+                3. Upload files and test with GA4 Real-time reports`
+            }
+        };
+
+        function selectScenario(id, icon, label, gsc, gtm, ga4) {
+            currentScenario = { id, icon, label, gsc, gtm, ga4 };
+            
+            // Update UI
+            document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.scenario-btn').classList.add('selected');
+            
+            // Show status section
+            document.getElementById('status-section').classList.remove('hidden');
+            updateStatusDisplay(gsc, gtm, ga4);
+            
+            // Show CMS section
+            document.getElementById('cms-section').classList.remove('hidden');
+            
+            // Reset selections
+            currentCMS = null;
+            currentMode = null;
+            document.getElementById('mode-section').classList.add('hidden');
+            document.getElementById('plan-section').classList.add('hidden');
+        }
+
+        function updateStatusDisplay(gsc, gtm, ga4) {
+            const tools = [
+                { id: 'gsc', has: gsc },
+                { id: 'gtm', has: gtm },
+                { id: 'ga4', has: ga4 }
+            ];
+
+            tools.forEach(tool => {
+                const statusDiv = document.getElementById(`${tool.id}-status`);
+                const indicator = document.getElementById(`${tool.id}-indicator`);
+                
+                if (tool.has) {
+                    statusDiv.className = 'flex items-center p-3 rounded-lg border-2 bg-green-50 border-green-200';
+                    indicator.innerHTML = '<span class="w-4 h-4 rounded-full bg-green-600 mr-1"></span><span class="text-sm text-green-700">Already Setup</span>';
+                } else {
+                    statusDiv.className = 'flex items-center p-3 rounded-lg border-2 bg-red-50 border-red-200';
+                    indicator.innerHTML = '<span class="w-4 h-4 rounded-full bg-red-600 mr-1"></span><span class="text-sm text-red-700">Needs Setup</span>';
+                }
+            });
+        }
+
+        function selectCMS(id, name, difficulty) {
+            currentCMS = { id, name, difficulty };
+            
+            // Update UI
+            document.querySelectorAll('.cms-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.cms-btn').classList.add('selected');
+            
+            // Show mode section
+            document.getElementById('mode-section').classList.remove('hidden');
+            
+            // Reset mode selection
+            currentMode = null;
+            document.getElementById('plan-section').classList.add('hidden');
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Update UI
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.mode-btn').classList.add('selected');
+            
+            // Show plan section
+            document.getElementById('plan-section').classList.remove('hidden');
+            generateActionPlan();
+        }
+
+        function generateActionPlan() {
+            if (!currentScenario || !currentCMS || !currentMode) return;
+            
+            const scenarioData = scenarios[currentScenario.id];
+            const planContent = document.getElementById('plan-content');
+            
+            let html = `<h3 class="text-lg font-medium mb-4">${scenarioData.title}</h3>`;
+            
+            if (currentMode === 'professional') {
+                html += `
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <h4 class="font-medium text-blue-800 mb-2">🔑 Access Instructions - Follow These Steps:</h4>
+                        <div class="text-sm text-blue-700 space-y-3">
+                            <div class="bg-white rounded p-3 border">
+                                <strong>Google Search Console Access:</strong><br>
+                                1. Go to <a href="https://search.google.com/search-console" class="underline">search.google.com/search-console</a><br>
+                                2. Select your property → Settings (gear icon) → Users and permissions<br>
+                                3. Click "Add user" → Enter: <strong>gsd@kanahiku.com</strong><br>
+                                4. Select "Full" permissions → Click "Add"
+                            </div>
+                            <div class="bg-white rounded p-3 border">
+                                <strong>Google Analytics Access:</strong><br>
+                                1. Go to <a href="https://analytics.google.com" class="underline">analytics.google.com</a><br>
+                                2. Click "Admin" (gear icon) → Account Access Management<br>
+                                3. Click "+" → Add users → Enter: <strong>gsd@kanahiku.com</strong><br>
+                                4. Select "Administrator" role → Click "Add"
+                            </div>
+                            <div class="bg-white rounded p-3 border">
+                                <strong>Google Tag Manager Access:</strong><br>
+                                1. Go to <a href="https://tagmanager.google.com" class="underline">tagmanager.google.com</a><br>
+                                2. Select account → Admin → User Management<br>
+                                3. Click "+" → Enter: <strong>gsd@kanahiku.com</strong><br>
+                                4. Check: Read, Edit, Delete, Publish → Click "Send"
+                            </div>
+                            <div class="bg-white rounded p-3 border">
+                                <strong>${currentCMS.name} Website Access:</strong><br>
+                                ${getWebsiteAccessInstructions(currentCMS.id)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '<div class="space-y-4">';
+            
+            scenarioData.steps.forEach((step, index) => {
+                html += `
+                    <div class="border-2 rounded-lg p-4 ${step.color}">
+                        <div class="flex items-start">
+                            <div class="bg-white rounded-full w-8 h-8 flex items-center justify-center mr-4 border-2 border-gray-300 font-bold text-sm">
+                                ${step.priority}
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium mb-3">${step.action}</div>
+                                
+                                <!-- Detailed Steps -->
+                                <div class="bg-white rounded-lg p-3 border mb-3">
+                                    <div class="font-medium text-sm text-gray-800 mb-2">📋 Step-by-Step Instructions:</div>
+                                    <ol class="text-sm text-gray-700 space-y-1">
+                                        ${step.substeps.map((substep, index) => 
+                                            `<li class="flex items-start">
+                                                <span class="inline-block w-6 h-6 bg-gray-100 rounded-full text-xs font-medium flex items-center justify-center mr-2 mt-0.5 flex-shrink-0">${index + 1}</span>
+                                                <span>${substep}</span>
+                                            </li>`
+                                        ).join('')}
+                                    </ol>
+                                </div>
+                `;
+                
+                if (currentMode === 'self') {
+                    const instruction = getInstruction(step.tool);
+                    html += `
+                        <div class="text-sm text-gray-700 bg-blue-50 rounded-lg p-3 border border-blue-200">
+                            <div class="font-medium text-blue-800 mb-1">🔧 ${currentCMS.name} Specific Instructions:</div>
+                            <div class="text-blue-700">${instruction}</div>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            
+            html += `
+                <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center">
+                        <span class="w-5 h-5 rounded-full bg-green-600 mr-2"></span>
+                        <span class="font-medium text-green-800">Expected Timeline:</span>
+                    </div>
+                    <div class="text-sm text-green-700 mt-1">
+                        ${currentMode === 'self' ? '2-4 hours (depending on experience)' : '1-2 business days for complete setup'}
+                    </div>
+                </div>
+            `;
+            
+            planContent.innerHTML = html;
+        }
+
+        function getWebsiteAccessInstructions(cmsId) {
+            const accessInstructions = {
+                'wordpress-org': 'Administrator account or FTP/cPanel credentials<br>• Dashboard URL: yoursite.com/wp-admin<br>• Username & Password needed',
+                'wordpress-com': 'Administrator access to WordPress.com account<br>• Invite user via: My Site → Settings → Users<br>• Role: Administrator',
+                'shopify': 'Staff account with permissions<br>• Admin → Settings → Account and permissions<br>• Add staff → Check "Apps and channels" permission',
+                'squarespace': 'Administrator or contributor access<br>• Settings → Permissions → Invite Contributor<br>• Email: gsd@kanahiku.com with Admin rights',
+                'wix': 'Admin access or collaborator permissions<br>• Dashboard → Roles & Permissions → Invite People<br>• Role: Admin or Site Member with edit access',
+                'webflow': 'Admin or Editor access to project<br>• Project Settings → Team → Invite Member<br>• Role: Admin or Editor permissions',
+                'godaddy': 'Website Builder admin login credentials<br>• Or delegate access via GoDaddy account<br>• Account → Delegate Access',
+                'bigcommerce': 'Admin user account<br>• Settings → Account Settings → Users<br>• Create user with Administrator role',
+                'custom': 'FTP credentials or hosting control panel access<br>• FTP: Host, Username, Password, Port<br>• Or cPanel/hosting admin login'
+            };
+            return accessInstructions[cmsId] || 'Platform-specific admin access required';
+        }
+
+        function getInstruction(tool) {
+            const instructions = cmsInstructions[currentCMS.id];
+            if (instructions && instructions[tool]) {
+                return instructions[tool];
+            }
+            return 'Follow platform-specific verification and linking procedures in the full documentation.';
+        }
+    </script>
+</body>
+</html>
